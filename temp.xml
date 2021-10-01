@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<BugCollection version="4.1.4" sequence="0" timestamp="1633097502000" analysisTimestamp="1633097519671" release="">
+  <Project projectName="">
+    <Jar>target/my-app-bad-1.0-SNAPSHOT.jar</Jar>
+    <Plugin id="com.h3xstream.findsecbugs" enabled="true"/>
+  </Project>
+  <BugInstance type="PREDICTABLE_RANDOM" priority="2" rank="12" abbrev="SECPR" category="SECURITY" instanceHash="44d60f87b6310d75389ce03b35f8ae60" instanceOccurrenceNum="0" instanceOccurrenceMax="0" cweid="330">
+    <ShortMessage>Predictable pseudorandom number generator</ShortMessage>
+    <LongMessage>This random generator (java.util.Random) is predictable</LongMessage>
+    <Class classname="com.mycompany.app.App" primary="true">
+      <SourceLine classname="com.mycompany.app.App" start="11" end="27" sourcefile="App.java" sourcepath="com/mycompany/app/App.java">
+        <Message>At App.java:[lines 11-27]</Message>
+      </SourceLine>
+      <Message>In class com.mycompany.app.App</Message>
+    </Class>
+    <Method classname="com.mycompany.app.App" name="generateSecretToken" signature="()Ljava/lang/String;" isStatic="false" primary="true">
+      <SourceLine classname="com.mycompany.app.App" start="22" end="23" startBytecode="0" endBytecode="71" sourcefile="App.java" sourcepath="com/mycompany/app/App.java"/>
+      <Message>In method com.mycompany.app.App.generateSecretToken()</Message>
+    </Method>
+    <SourceLine classname="com.mycompany.app.App" primary="true" start="22" end="22" startBytecode="4" endBytecode="4" sourcefile="App.java" sourcepath="com/mycompany/app/App.java">
+      <Message>At App.java:[line 22]</Message>
+    </SourceLine>
+    <String value="java.util.Random">
+      <Message>Value java.util.Random</Message>
+    </String>
+  </BugInstance>
+  <BugCategory category="SECURITY">
+    <Description>Security</Description>
+  </BugCategory>
+  <BugPattern type="PREDICTABLE_RANDOM" abbrev="SECPR" category="SECURITY" cweid="330">
+    <ShortDescription>Predictable pseudorandom number generator</ShortDescription>
+    <Details><![CDATA[
+            
+<p>The use of a predictable random value can lead to vulnerabilities when used in certain security critical contexts. For example, when the value is used as:</p>
+<ul>
+<li>a CSRF token: a predictable token can lead to a CSRF attack as an attacker will know the value of the token</li>
+<li>a password reset token (sent by email): a predictable password token can lead to an account takeover, since an attacker will guess the URL of the "change password" form</li>
+<li>any other secret value</li>
+</ul>
+<p>
+A quick fix could be to replace the use of <code>java.util.Random</code> with something stronger, such as <code>java.security.SecureRandom</code>.
+</p>
+<p>
+<b>Vulnerable Code:</b><br/>
+<pre>String generateSecretToken() {
+    Random r = new Random();
+    return Long.toHexString(r.nextLong());
+}</pre>
+</p>
+<p>
+<b>Solution:</b>
+<pre>import org.apache.commons.codec.binary.Hex;
+
+String generateSecretToken() {
+    SecureRandom secRandom = new SecureRandom();
+
+    byte[] result = new byte[32];
+    secRandom.nextBytes(result);
+    return Hex.encodeHexString(result);
+}</pre>
+</p>
+<br/>
+<p>
+<b>References</b><br/>
+<a href="https://jazzy.id.au/2010/09/20/cracking_random_number_generators_part_1.html">Cracking Random Number Generators - Part 1 (https://jazzy.id.au)</a><br/>
+<a href="https://www.securecoding.cert.org/confluence/display/java/MSC02-J.+Generate+strong+random+numbers">CERT: MSC02-J. Generate strong random numbers</a><br/>
+<a href="https://cwe.mitre.org/data/definitions/330.html">CWE-330: Use of Insufficiently Random Values</a><br/>
+<a href="https://blog.h3xstream.com/2014/12/predicting-struts-csrf-token-cve-2014.html">Predicting Struts CSRF Token (Example of real-life vulnerability and exploitation)</a>
+</p>
+
+        ]]></Details>
+  </BugPattern>
+  <BugCode abbrev="SECPR">
+    <Description>Predictable Pseudo Random Generator</Description>
+  </BugCode>
+  <Errors errors="0" missingClasses="0"></Errors>
+  <FindBugsSummary timestamp="Fri, 1 Oct 2021 15:11:42 +0100" total_classes="1" referenced_classes="14" total_bugs="1" total_size="15" num_packages="1" java_version="1.8.0_172" vm_version="25.172-b11" cpu_seconds="7.22" clock_seconds="4.33" peak_mbytes="111.25" alloc_mbytes="3641.00" gc_seconds="0.04" priority_2="1">
+    <FileStats path="com/mycompany/app/App.java" bugCount="1" size="15" bugHash="4de5556650680c799fd077d7739aca00"/>
+    <PackageStats package="com.mycompany.app" total_bugs="1" total_types="1" total_size="15" priority_2="1">
+      <ClassStats class="com.mycompany.app.App" sourceFile="App.java" interface="false" size="15" bugs="1" priority_2="1"/>
+    </PackageStats>
+    <FindBugsProfile>
+      <ClassProfile name="edu.umd.cs.findbugs.classfile.engine.ClassInfoAnalysisEngine" totalMilliseconds="554" invocations="349" avgMicrosecondsPerInvocation="1589" maxMicrosecondsPerInvocation="30601" standardDeviationMicrosecondsPerInvocation="3911"/>
+      <ClassProfile name="edu.umd.cs.findbugs.detect.FieldItemSummary" totalMilliseconds="150" invocations="14" avgMicrosecondsPerInvocation="10744" maxMicrosecondsPerInvocation="36985" standardDeviationMicrosecondsPerInvocation="10712"/>
+      <ClassProfile name="edu.umd.cs.findbugs.classfile.engine.bcel.MethodGenFactory" totalMilliseconds="124" invocations="4" avgMicrosecondsPerInvocation="31233" maxMicrosecondsPerInvocation="124095" standardDeviationMicrosecondsPerInvocation="53614"/>
+      <ClassProfile name="com.h3xstream.findsecbugs.injection.trust.TrustBoundaryViolationValueDetector" totalMilliseconds="122" invocations="1" avgMicrosecondsPerInvocation="122843" maxMicrosecondsPerInvocation="122843" standardDeviationMicrosecondsPerInvocation="0"/>
+      <ClassProfile name="edu.umd.cs.findbugs.OpcodeStack$JumpInfoFactory" totalMilliseconds="117" invocations="74" avgMicrosecondsPerInvocation="1593" maxMicrosecondsPerInvocation="13683" standardDeviationMicrosecondsPerInvocation="2503"/>
+      <ClassProfile name="edu.umd.cs.findbugs.detect.FindNoSideEffectMethods" totalMilliseconds="116" invocations="14" avgMicrosecondsPerInvocation="8346" maxMicrosecondsPerInvocation="25775" standardDeviationMicrosecondsPerInvocation="8245"/>
+      <ClassProfile name="edu.umd.cs.findbugs.classfile.engine.bcel.JavaClassAnalysisEngine" totalMilliseconds="110" invocations="41" avgMicrosecondsPerInvocation="2687" maxMicrosecondsPerInvocation="44940" standardDeviationMicrosecondsPerInvocation="8076"/>
+      <ClassProfile name="com.h3xstream.findsecbugs.PredictableRandomDetector" totalMilliseconds="84" invocations="1" avgMicrosecondsPerInvocation="84195" maxMicrosecondsPerInvocation="84195" standardDeviationMicrosecondsPerInvocation="0"/>
+      <ClassProfile name="edu.umd.cs.findbugs.detect.CalledMethods" totalMilliseconds="82" invocations="14" avgMicrosecondsPerInvocation="5891" maxMicrosecondsPerInvocation="44543" standardDeviationMicrosecondsPerInvocation="12088"/>
+      <ClassProfile name="edu.umd.cs.findbugs.classfile.engine.ClassDataAnalysisEngine" totalMilliseconds="81" invocations="350" avgMicrosecondsPerInvocation="232" maxMicrosecondsPerInvocation="12235" standardDeviationMicrosecondsPerInvocation="1031"/>
+      <ClassProfile name="edu.umd.cs.findbugs.util.TopologicalSort" totalMilliseconds="81" invocations="317" avgMicrosecondsPerInvocation="255" maxMicrosecondsPerInvocation="14525" standardDeviationMicrosecondsPerInvocation="947"/>
+      <ClassProfile name="edu.umd.cs.findbugs.detect.NoteDirectlyRelevantTypeQualifiers" totalMilliseconds="80" invocations="14" avgMicrosecondsPerInvocation="5729" maxMicrosecondsPerInvocation="38396" standardDeviationMicrosecondsPerInvocation="9787"/>
+      <ClassProfile name="edu.umd.cs.findbugs.detect.FindInconsistentSync2" totalMilliseconds="75" invocations="1" avgMicrosecondsPerInvocation="75247" maxMicrosecondsPerInvocation="75247" standardDeviationMicrosecondsPerInvocation="0"/>
+      <ClassProfile name="edu.umd.cs.findbugs.detect.BuildStringPassthruGraph" totalMilliseconds="68" invocations="14" avgMicrosecondsPerInvocation="4865" maxMicrosecondsPerInvocation="34536" standardDeviationMicrosecondsPerInvocation="9160"/>
+      <ClassProfile name="edu.umd.cs.findbugs.detect.OverridingEqualsNotSymmetrical" totalMilliseconds="65" invocations="14" avgMicrosecondsPerInvocation="4654" maxMicrosecondsPerInvocation="26718" standardDeviationMicrosecondsPerInvocation="7894"/>
+      <ClassProfile name="com.h3xstream.findsecbugs.taintanalysis.TaintDataflowEngine" totalMilliseconds="59" invocations="4" avgMicrosecondsPerInvocation="14979" maxMicrosecondsPerInvocation="54842" standardDeviationMicrosecondsPerInvocation="23060"/>
+      <ClassProfile name="edu.umd.cs.findbugs.detect.FunctionsThatMightBeMistakenForProcedures" totalMilliseconds="57" invocations="14" avgMicrosecondsPerInvocation="4113" maxMicrosecondsPerInvocation="17715" standardDeviationMicrosecondsPerInvocation="5192"/>
+      <ClassProfile name="edu.umd.cs.findbugs.classfile.engine.bcel.MethodFactory" totalMilliseconds="41" invocations="8" avgMicrosecondsPerInvocation="5137" maxMicrosecondsPerInvocation="39959" standardDeviationMicrosecondsPerInvocation="13161"/>
+    </FindBugsProfile>
+  </FindBugsSummary>
+  <ClassFeatures></ClassFeatures>
+  <History></History>
+</BugCollection>
